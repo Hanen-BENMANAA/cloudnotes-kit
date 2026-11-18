@@ -1,0 +1,19 @@
+name: devsecops
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Secrets (gitleaks)
+        run: docker run --rm -v $PWD:/p zricethezav/gitleaks detect -s /p
+      - name: SAST (Semgrep)
+        run: docker run --rm -v $PWD:/src semgrep/semgrep semgrep --error --config p/python /src
+      - name: Build
+        run: docker build -t cloudnotes:ci .
+      - name: SCA + image (Trivy)
+        run: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image --exit-code 1 --severity HIGH,CRITICAL cloudnotes:ci
+      - name: IaC (Checkov)
+        run: docker run --rm -v $PWD:/tf bridgecrew/checkov -d /tf --quiet

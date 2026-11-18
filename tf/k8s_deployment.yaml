@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudnotes
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: cloudnotes}
+  template:
+    metadata:
+      labels: {app: cloudnotes}
+    spec:
+      containers:
+        - name: app
+          image: cloudnotes:latest        # DEFAUT : tag latest
+          securityContext:
+            privileged: true              # DEFAUT : privilegie

@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudnotes
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: cloudnotes}
+  template:
+    metadata:
+      labels: {app: cloudnotes}
+    spec:
+      containers:
+        - name: app
+          image: cloudnotes@sha256:REMPLACER_PAR_LE_DIGEST
+          securityContext:
+            privileged: false
+            runAsNonRoot: true
+            runAsUser: 10001
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities: {drop: ["ALL"]}
+          resources:
+            limits: {memory: 128Mi, cpu: 250m}
+            requests: {memory: 64Mi, cpu: 100m}
